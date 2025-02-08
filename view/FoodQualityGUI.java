@@ -11,10 +11,9 @@ public class FoodQualityGUI extends JFrame {
     private JTextField idField;
     private JTextArea outputArea;
 
-    //หน้า GUI
     public FoodQualityGUI() {
         setTitle("Food Quality Checker");
-        setSize(500, 300);
+        setSize(500, 350);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setResizable(false);
         setLocationRelativeTo(null);
@@ -46,9 +45,16 @@ public class FoodQualityGUI extends JFrame {
         gbc.gridwidth = 2;
         inputPanel.add(checkButton, gbc);
 
+        JButton reportButton = new JButton("สร้างรายงานสรุป");
+        reportButton.setFont(thaiFont);
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        gbc.gridwidth = 2;
+        inputPanel.add(reportButton, gbc);
+
         add(inputPanel, BorderLayout.NORTH);
 
-        outputArea = new JTextArea(5, 30);
+        outputArea = new JTextArea(7, 30);
         outputArea.setFont(thaiFont);
         outputArea.setEditable(false);
         outputArea.setLineWrap(true);
@@ -68,6 +74,14 @@ public class FoodQualityGUI extends JFrame {
                 
                 String result = FoodController.getFoodStatus(foodId);
                 outputArea.setText(result);
+            }
+        });
+
+        reportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                String report = FoodController.generateReport();
+                outputArea.setText(report);
             }
         });
     }

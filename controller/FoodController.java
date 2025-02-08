@@ -19,8 +19,7 @@ public class FoodController {
         }
     }
 
-    //ตรวจสอบว่าสินค้ามีอยู่ในฐานข้อมูลไหม
-     
+    // ตรวจสอบว่าสินค้ามีอยู่ในฐานข้อมูลไหม
     public static boolean isFoodIdValid(String foodId) {
         try {
             return CSVHandler.checkFoodIdExists(foodId);
@@ -30,9 +29,7 @@ public class FoodController {
         }
     }
 
-    
-    //ตรวจสอบว่าอาหารหมดอายุหรือยัง
-     
+    // ตรวจสอบว่าอาหารหมดอายุหรือยัง
     public static boolean checkIfExpired(FoodItem foodItem) {
         return foodItem.isExpired();
     }
@@ -71,10 +68,50 @@ public class FoodController {
             if (item.getId().equals(foodId)) {
                 boolean expired = item.isExpired();
                 String result = "รหัส: " + item.getId() + "\nประเภท: " + item.getType() + "\nวันหมดอายุ: " + item.getExpiryDate() + "\nสถานะ: " + (expired ? "หมดอายุแล้ว" : "ยังใช้ได้");
-                System.out.println(result); //Debugging
+                System.out.println(result); // Debugging
                 return result;
             }
         }
         return "ERROR: ไม่พบข้อมูลอาหารนี้";
+    }
+
+    /**
+     * สร้างรายงานสรุปจํานวนอาหาร
+     * returnข้อความสรุปจำนวนอาหารที่หมดอายุ และยังใช้ได้ แยกตามประเภท
+     */
+    public static String generateReport() {
+        List<FoodItem> foodItems;
+        try {
+            foodItems = CSVHandler.readFoodItems();
+        } catch (IOException e) {
+            return "ERROR: ไม่สามารถโหลดข้อมูลอาหารได้";
+        }
+
+        int totalFresh = 0, expiredFresh = 0;
+        int totalPreserved = 0, expiredPreserved = 0;
+        int totalCanned = 0, expiredCanned = 0;
+
+        for (FoodItem item : foodItems) {
+            boolean isExpired = item.isExpired();
+            switch (item.getType()) {
+                case "อาหารสด":
+                    totalFresh++;
+                    if (isExpired) expiredFresh++;
+                    break;
+                case "อาหารดอง":
+                    totalPreserved++;
+                    if (isExpired) expiredPreserved++;
+                    break;
+                case "อาหารกระป๋อง":
+                    totalCanned++;
+                    if (isExpired) expiredCanned++;
+                    break;
+            }
+        }
+
+        return "รายงานการตรวจสอบอาหาร\n" +
+               "อาหารสด: " + totalFresh + " รายการ, หมดอายุ: " + expiredFresh + " รายการ\n" +
+               "อาหารดอง: " + totalPreserved + " รายการ, หมดอายุ: " + expiredPreserved + " รายการ\n" +
+               "อาหารกระป๋อง: " + totalCanned + " รายการ, หมดอายุ: " + expiredCanned + " รายการ\n";
     }
 }
